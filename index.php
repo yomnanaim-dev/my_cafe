@@ -1,5 +1,7 @@
-<?php require("layouts/header.php"); ?>
-<?php require("layouts/navbar.php"); ?>
+<?php require("views/layouts/header.php"); ?>
+<?php require("views/layouts/navbar.php"); ?>
+
+
 
 <!-- Hero Section -->
 <header class="relative min-h-screen flex items-center pt-20">
@@ -58,4 +60,4 @@
 </div>
 </section>
 <?php require("public/js/script.php"); ?>
-<?php require("layouts/footer.php"); ?>
+<?php require("views/layouts/footer.php"); ?>
