@@ -8,6 +8,10 @@ $routes = [
     '/' => "controllers/index.php",
     '/about' => "controllers/about.php",
     '/contact' => "controllers/contact.php",
+    '/manual-order' => "controllers/OrderController.php",
+    '/users' => "controllers/UserController.php",
+    '/add-user' => "controllers/UserController.php",
+   
 ];
 
 function abort($code = 404)

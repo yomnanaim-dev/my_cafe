@@ -5,6 +5,8 @@
 <div class="hidden md:flex items-center space-x-8">
 <a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1 font-label-md text-label-md active:opacity-80 active:scale-[0.99] transition-transform" href="#">Home</a>
 <a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low/50 dark:hover:bg-surface-container-highest/10 transition-all duration-300 px-2 py-1 rounded" href="#">Menu</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low/50 dark:hover:bg-surface-container-highest/10 transition-all duration-300 px-2 py-1 rounded" href="/manual-order">Manual Order</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low/50 dark:hover:bg-surface-container-highest/10 transition-all duration-300 px-2 py-1 rounded" href="/users">Users</a>
 <a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low/50 dark:hover:bg-surface-container-highest/10 transition-all duration-300 px-2 py-1 rounded" href="#">About</a>
 <a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors font-label-md text-label-md hover:bg-surface-container-low/50 dark:hover:bg-surface-container-highest/10 transition-all duration-300 px-2 py-1 rounded" href="#">Contact</a>
 </div>
