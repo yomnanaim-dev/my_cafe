@@ -3,6 +3,52 @@
 
 require_once 'models/Order.php';
 
+// إنشاء اتصال بقاعدة البيانات (افترض إنه موجود في config/database.php)
+// لو مش موجود، هتحتاج تضبطه حسب نظامكم
+require_once 'config/database.php';
+$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+// التحقق من الاتصال
+if ($db->connect_error) {
+    die("Connection failed: " . $db->connect_error);
+}
+
+$orderController = new OrderController($db);
+
+// تحديد الـ Action بناءً على الـ URL
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+switch ($path) {
+    case '/admin/checks':
+        $orderController->checks();
+        break;
+        
+    case '/admin/current-orders':
+        $orderController->currentOrders();
+        break;
+        
+    case '/admin/update-status':
+        $orderController->updateStatus();
+        break;
+        
+    default:
+        // لو فيه Route dynamic (مثل /admin/order-details/5)
+        if (preg_match('#^/admin/order-details/(\d+)$#', $path, $matches)) {
+            $orderController->orderDetails($matches[1]);
+        } 
+        elseif (preg_match('#^/admin/order-details/user/(\d+)$#', $path, $matches)) {
+            // جلب طلبات مستخدم معين من صفحة الـ Checks
+            $userId = $matches[1];
+            $fromDate = $_GET['from'] ?? date('Y-m-d', strtotime('-7 days'));
+            $toDate = $_GET['to'] ?? date('Y-m-d');
+            $orderController->userOrders($userId, $fromDate, $toDate);
+        }
+        else {
+            abort(404);
+        }
+        break;
+}
+
 class OrderController {
     private $orderModel;
     
@@ -44,6 +90,13 @@ class OrderController {
         $order = $this->orderModel->getOrderById($orderId);
         $items = $this->orderModel->getOrderItems($orderId);
         include 'views/orders/order-details.php';
+    }
+    
+    // عرض طلبات مستخدم معين (للـ Drill-down)
+    public function userOrders($userId, $fromDate, $toDate) {
+        $orders = $this->orderModel->getOrdersByDateAndUser($fromDate, $toDate, $userId);
+        $userName = !empty($orders) ? $orders[0]['user_name'] : 'User';
+        include 'views/orders/user-orders.php';
     }
     
     // تحديث حالة الطلب (AJAX)
