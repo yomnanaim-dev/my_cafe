@@ -1,72 +1,48 @@
 <?php
 
-namespace Core;
-
-
 class Router
 {
-    protected $routes = [];
+    private array $routes = [];
 
-    public function get($url, $controller)
+    public function get(string $uri, array $action)
     {
-        $this->routes[] = [
-            "url"        => $url,
-            "controller" => $controller,
-            "method"     => "GET"
-        ];
+        $this->routes['GET'][$uri] = $action;
     }
 
-    public function post($url, $controller)
+    public function post(string $uri, array $action)
     {
-        $this->routes[] = [
-            "url"        => $url,
-            "controller" => $controller,
-            "method"     => "POST"
-        ];
+        $this->routes['POST'][$uri] = $action;
     }
 
-    public function delete($url, $controller)
+    public function dispatch()
     {
-        $this->routes[] = [
-            "url"        => $url,
-            "controller" => $controller,
-            "method"     => "DELETE"
-        ];
-    }
+        $method = $_SERVER['REQUEST_METHOD'];
 
-    public function put($url, $controller)
-    {
-        $this->routes[] = [
-            "url"        => $url,
-            "controller" => $controller,
-            "method"     => "PUT"
-        ];
-    }
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-    public function patch($url, $controller)
-    {
-        $this->routes[] = [
-            "url"        => $url,
-            "controller" => $controller,
-            "method"     => "PATCH"
-        ];
-    }
+        // Remove project folder from URL
+        $basePath = '/cafeteria/public';
 
-    public function route($url, $method)
-    {
-        foreach ($this->routes as $route) {
-            if ($route['url'] === $url && $route['method'] === strtoupper($method)) {
-                return require base_path($route['controller']);
-            }
+        if (str_starts_with($uri, $basePath)) {
+            $uri = substr($uri, strlen($basePath));
         }
 
-        $this->abort();
-    }
+        if ($uri === '') {
+            $uri = '/';
+        }
 
-    protected function abort($code = Response::NOT_FOUND)
-    {
-        http_response_code($code);
-        require base_path("views/errors/{$code}.php");
-        die();
+        if (isset($this->routes[$method][$uri])) {
+
+            [$controller, $function] =
+                $this->routes[$method][$uri];
+
+            $controllerInstance = new $controller();
+
+            return $controllerInstance->$function();
+        }
+
+        http_response_code(404);
+
+        echo "404 - Page Not Found";
     }
 }

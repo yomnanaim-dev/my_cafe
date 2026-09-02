@@ -1,46 +1,24 @@
 <?php require("core/functions.php"); ?>
-<?php
-// index.php
 
-// تعريف الثوابت في الأعلى
-define('BASE_URL', 'http://localhost/project/');
-define('ASSETS_URL', BASE_URL . 'assets/');
-
-?>
-<?php
-// تعريفات للـ Navigation Links
-$navLinks = [
-    ['name' => 'THE MENU', 'href' => '#menu'],
-    ['name' => 'THE LOUNGE', 'href' => '#lounge'],
-    ['name' => 'RESERVATIONS', 'href' => '#reservations'],
-    ['name' => 'ABOUT US', 'href' => '#about']
-];
-?>
-
-<nav class="navbar" id="navbar">
-    <div class="navbar-container">
-        <!-- LOGO Section -->
-        <div class="navbar-logo" id="navbarLogo">
-            <a href="<?php echo BASE_URL; ?>" class="logo-link">
-                <span class="logo-text">Verdant Café &</span>
-                <span class="logo-lounge">Lounge</span>
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-inverse-surface w-full border-b border-royal-gold/30 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-8 max-w-[1440px] mx-auto">
+<!-- Brand -->
+<a class="font-display-lg text-display-lg text-royal-gold dark:text-secondary-fixed tracking-widest hover:opacity-80 transition-opacity" href="#">
+                Verdant Café &amp; Lounge
             </a>
-        </div>
-
-        <!-- Navigation Links -->
-        <ul class="navbar-menu" id="navbarMenu">
-            <?php foreach($navLinks as $link): ?>
-                <li class="navbar-item">
-                    <a href="<?php echo htmlspecialchars($link['href']); ?>" class="navbar-link">
-                        <?php echo htmlspecialchars($link['name']); ?>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-
-        <!-- Mobile Menu Toggle -->
-        <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation menu">
-            <span class="hamburger"></span>
-        </button>
-    </div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex space-x-element-gap items-center">
+<a class="font-subheading-caps text-subheading-caps uppercase tracking-[0.2em] text-deep-forest/80 dark:text-tertiary-fixed-dim hover:text-royal-gold transition-colors duration-300 scale-95 duration-200 ease-in-out" href="#">
+                    The Menu
+                </a>
+<a class="font-subheading-caps text-subheading-caps uppercase tracking-[0.1em] text-deep-forest/80 dark:text-tertiary-fixed-dim hover:text-royal-gold transition-colors duration-300 scale-95 duration-200 ease-in-out" href="#">
+                    The Lounge
+                </a>
+<a class="font-subheading-caps text-subheading-caps uppercase tracking-[0.2em] text-deep-forest/80 dark:text-tertiary-fixed-dim hover:text-royal-gold transition-colors duration-300 scale-95 duration-200 ease-in-out" href="#">
+                    Reservations
+                </a>
+<a class="font-subheading-caps text-subheading-caps uppercase tracking-[0.2em] text-deep-forest/80 dark:text-tertiary-fixed-dim hover:text-royal-gold transition-colors duration-300 scale-95 duration-200 ease-in-out" href="#">
+                    About Us
+                </a>
 </nav>
