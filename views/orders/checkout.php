@@ -9,7 +9,6 @@
     <div class="container">
         <h1>📊 Order Checks</h1>
         
-        <!-- Filters -->
         <form method="GET" action="/admin/checks" class="filters">
             <div class="filter-group">
                 <label>From Date:</label>
@@ -36,7 +35,6 @@
             <button type="submit">Apply Filters</button>
         </form>
         
-        <!-- Results -->
         <table class="checks-table">
             <thead>
                 <tr>
@@ -53,16 +51,16 @@
                     <?php foreach ($reportData as $userId => $data): ?>
                         <tr>
                             <td>
-                                <a href="/admin/order-details/user/<?= $userId ?>" class="user-link">
+                                <a href="/admin/order-details/user/<?= $userId ?>?from=<?= $fromDate ?>&to=<?= $toDate ?>" class="user-link">
                                     <?= htmlspecialchars($data['user_name']) ?>
                                 </a>
                             </td>
                             <td><?= $data['order_count'] ?></td>
                             <td><?= number_format($data['total_amount'], 2) ?> EGP</td>
                             <td>
-                                <button onclick="viewUserOrders(<?= $userId ?>, '<?= $fromDate ?>', '<?= $toDate ?>')">
+                                <a href="/admin/order-details/user/<?= $userId ?>?from=<?= $fromDate ?>&to=<?= $toDate ?>" class="details-link">
                                     View Orders
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
