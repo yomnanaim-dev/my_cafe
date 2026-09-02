@@ -1,5 +1,15 @@
 <?php
 
+// routes/web.php أو route.php
+
+// Routes الخاصة بـ Merna (Admin Orders)
+$router->addRoute('/admin/checks', 'OrderController', 'checks');
+$router->addRoute('/admin/current-orders', 'OrderController', 'currentOrders');
+$router->addRoute('/admin/order-details/(\d+)', 'OrderController', 'orderDetails');
+$router->addRoute('/admin/update-status', 'OrderController', 'updateStatus');
+
+
+
 
 
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
