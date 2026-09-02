@@ -4,54 +4,26 @@
 class Order {
     private $db;
     
-    public function __construct($dbConnection) {
-        $this->db = $dbConnection;
+    public function __construct($db) {
+        $this->db = $db;
     }
     
-    // 1. جلب كل الطلبات مع بيانات المستخدمين
-    public function getAllOrders() {
-        $query = "SELECT orders.*, users.name as user_name 
+    public function getCurrentOrders() {
+        $query = "SELECT orders.*, users.user_name, users.room_id, room.room_number
                   FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  ORDER BY orders.order_date DESC";
+                  JOIN users ON orders.user_id = users.user_id 
+                  LEFT JOIN room ON users.room_id = room.room_id
+                  WHERE orders.order_status != 'completed'
+                  ORDER BY orders.order_created_at DESC";
         $result = $this->db->query($query);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
-    // 2. جلب الطلبات حسب نطاق تاريخي
-    public function getOrdersByDateRange($fromDate, $toDate) {
-        $query = "SELECT orders.*, users.name as user_name 
-                  FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  WHERE DATE(orders.order_date) BETWEEN ? AND ?
-                  ORDER BY orders.order_date DESC";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ss", $fromDate, $toDate);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    
-    // 3. جلب الطلبات حسب مستخدم معين
-    public function getOrdersByUser($userId) {
-        $query = "SELECT orders.*, users.name as user_name 
-                  FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  WHERE orders.user_id = ?
-                  ORDER BY orders.order_date DESC";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    
-    // 4. جلب الطلبات حسب التاريخ والمستخدم (فلترة مزدوجة)
     public function getOrdersByDateAndUser($fromDate, $toDate, $userId = null) {
-        $query = "SELECT orders.*, users.name as user_name 
+        $query = "SELECT orders.*, users.user_name
                   FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  WHERE DATE(orders.order_date) BETWEEN ? AND ?";
+                  JOIN users ON orders.user_id = users.user_id 
+                  WHERE DATE(orders.order_created_at) BETWEEN ? AND ?";
         
         $params = [$fromDate, $toDate];
         $types = "ss";
@@ -62,7 +34,7 @@ class Order {
             $types .= "i";
         }
         
-        $query .= " ORDER BY orders.order_date DESC";
+        $query .= " ORDER BY orders.order_created_at DESC";
         
         $stmt = $this->db->prepare($query);
         $stmt->bind_param($types, ...$params);
@@ -71,23 +43,12 @@ class Order {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
-    // 5. جلب الطلبات الحالية (غير المكتملة)
-    public function getCurrentOrders() {
-        $query = "SELECT orders.*, users.name as user_name 
-                  FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  WHERE orders.status != 'Done'
-                  ORDER BY orders.order_date DESC";
-        $result = $this->db->query($query);
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-    
-    // 6. جلب طلب محدد بالـ ID
     public function getOrderById($orderId) {
-        $query = "SELECT orders.*, users.name as user_name 
+        $query = "SELECT orders.*, users.user_name, users.room_id, room.room_number
                   FROM orders 
-                  JOIN users ON orders.user_id = users.id 
-                  WHERE orders.id = ?";
+                  JOIN users ON orders.user_id = users.user_id 
+                  LEFT JOIN room ON users.room_id = room.room_id
+                  WHERE orders.order_id = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("i", $orderId);
         $stmt->execute();
@@ -95,12 +56,12 @@ class Order {
         return $result->fetch_assoc();
     }
     
-    // 7. جلب تفاصيل المنتجات في طلب معين
     public function getOrderItems($orderId) {
-        $query = "SELECT order_items.*, products.name as product_name 
-                  FROM order_items 
-                  JOIN products ON order_items.product_id = products.id 
-                  WHERE order_items.order_id = ?";
+        // تصحيح: اسم الجدول هو order_item (مفرد) مش order_items (جمع)
+        $query = "SELECT order_item.*, products.product_name, products.product_price
+                  FROM order_item 
+                  JOIN products ON order_item.product_id = products.product_id 
+                  WHERE order_item.order_id = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("i", $orderId);
         $stmt->execute();
@@ -108,23 +69,20 @@ class Order {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
-    // 8. تحديث حالة الطلب (مع التحقق من الصلاحية)
     public function updateStatus($orderId, $status) {
-        // التحقق من أن الحالة مسموح بها
-        $allowedStatuses = ['Processing', 'Out for Delivery', 'Done'];
-        if (!in_array($status, $allowedStatuses)) {
+        $allowedStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+        if (!in_array(strtolower($status), $allowedStatuses)) {
             return false;
         }
         
-        $query = "UPDATE orders SET status = ? WHERE id = ?";
+        $query = "UPDATE orders SET order_status = ? WHERE order_id = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("si", $status, $orderId);
         return $stmt->execute();
     }
     
-    // 9. جلب جميع المستخدمين (للقائمة المنسدلة)
     public function getAllUsers() {
-        $query = "SELECT id, name FROM users ORDER BY name";
+        $query = "SELECT user_id, user_name FROM users ORDER BY user_name";
         $result = $this->db->query($query);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
