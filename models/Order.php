@@ -23,7 +23,7 @@ class Order {
         $query = "SELECT orders.*, users.name as user_name 
                   FROM orders 
                   JOIN users ON orders.user_id = users.id 
-                  WHERE orders.order_date BETWEEN ? AND ?
+                  WHERE DATE(orders.order_date) BETWEEN ? AND ?
                   ORDER BY orders.order_date DESC";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("ss", $fromDate, $toDate);
@@ -51,7 +51,7 @@ class Order {
         $query = "SELECT orders.*, users.name as user_name 
                   FROM orders 
                   JOIN users ON orders.user_id = users.id 
-                  WHERE orders.order_date BETWEEN ? AND ?";
+                  WHERE DATE(orders.order_date) BETWEEN ? AND ?";
         
         $params = [$fromDate, $toDate];
         $types = "ss";
