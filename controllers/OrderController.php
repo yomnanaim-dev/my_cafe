@@ -80,17 +80,19 @@ class OrderController {
     }
     
     // عرض الطلبات الحالية
-    public function currentOrders() {
-        $orders = $this->orderModel->getCurrentOrders();
-        include 'views/orders/current-orders.php';
-    }
-    
-    // عرض تفاصيل طلب معين
-    public function orderDetails($orderId) {
-        $order = $this->orderModel->getOrderById($orderId);
-        $items = $this->orderModel->getOrderItems($orderId);
-        include 'views/orders/order-details.php';
-    }
+public function currentOrders() {
+    $orders = $this->orderModel->getCurrentOrders();
+    include 'views/orders/current-orders.php';  // ملف مستقل
+}
+
+// عرض طلبات مستخدم معين (للـ Drill-down)
+public function userOrders($userId, $fromDate, $toDate) {
+    $orders = $this->orderModel->getOrdersByDateAndUser($fromDate, $toDate, $userId);
+    $userName = !empty($orders) ? $orders[0]['user_name'] : 'User';
+    include 'views/orders/user-orders.php';  // ملف جديد منفصل
+}
+
+
     
     // عرض طلبات مستخدم معين (للـ Drill-down)
     public function userOrders($userId, $fromDate, $toDate) {
