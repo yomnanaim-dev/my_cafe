@@ -1,4 +1,4 @@
-<!-- Footer -->
+Footer
 <footer class="w-full mt-section-gap bg-surface-container-low dark:bg-inverse-surface border-t border-tertiary/20">
 <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 grid grid-cols-1 md:grid-cols-4 gap-gutter">
 <div>

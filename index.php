@@ -1,6 +1,7 @@
+
 <?php require("views/layouts/header.php"); ?>
 <?php require("views/layouts/navbar.php"); ?>
-
+<?php require ("views/auth/login.php");?>
 
 
 <!-- Hero Section -->
