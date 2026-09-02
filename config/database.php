@@ -13,22 +13,19 @@ class DataBase
             'root',
             'root',
             [
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]
         );
     }
 
-    public function query($query)
+    public function query($query, $params = [])
     {
         $statement = $this->connection->prepare($query);
-        $statement->execute();
+        $statement->execute($params);
 
         return $statement;
     }
 }
 
 $db = new DataBase();
-
-$result = $db->query("SELECT * FROM users")->fetchAll();
-
-var_dump($result);
