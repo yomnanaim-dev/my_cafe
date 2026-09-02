@@ -1,7 +1,6 @@
-
-<?php require "views/layouts/header.php"; ?>
+<?php require BASE_PATH . "/views/layouts/header.php"; ?>
 <link rel="stylesheet" href="public/css/users.css">
-<?php require "views/layouts/navbar.php"; ?>
+<?php require BASE_PATH . "/views/layouts/navbar.php"; ?>
 
 <main class="main-content" style="padding-top: 120px; padding-bottom: 60px;">
     <div class="header-actions">
@@ -18,41 +17,34 @@
                     <th>ROOM</th>
                     <th>EXT.</th>
                     <th>ACTIONS</th>
-                 </tr>
+                </tr>
             </thead>
             <tbody>
+                <?php foreach ($users as $u): ?>
                 <tr>
                     <td>
                         <div class="user-info">
-                            <div class="avatar">User</div>
-                            <span>Abdulrahman Hamdy</span>
+                            <?php if (!empty($u['user_image'])): ?>
+                                <img src="/<?php echo htmlspecialchars($u['user_image']); ?>" alt="Avatar" 
+                                class="avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                            <?php else: ?>
+                                <div class="avatar">User</div>
+                            <?php endif; ?>
+                            <span><?php echo htmlspecialchars($u['user_name']); ?></span>
                         </div>
                     </td>
-                    <td>mohamed@example.com</td>
-                    <td>302</td>
-                    <td>105</td>
+                    <td><?php echo htmlspecialchars($u['user_email']); ?></td>
+                    <td><?php echo htmlspecialchars($u['room_number'] ?? 'N/A'); ?></td>
+                    <td><?php echo htmlspecialchars($u['ext'] ?? 'N/A'); ?></td>
                     <td>
-                        <a href="/add-user?id=1" class="btn-edit">Edit</a>
-                        <a href="#" class="btn-delete">Delete</a>
+                        <a href="/add-user?id=<?php echo $u['user_id']; ?>" class="btn-edit">Edit</a>
+                        <a href="/delete-user?id=<?php echo $u['user_id']; ?>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <div class="user-info">
-                            <div class="avatar">User</div>
-                            <span>Sarah Jenkins</span>
-                        </div>
-                    </td>
-                    <td>sarah@example.com</td>
-                    <td>201</td>
-                    <td>102</td>
-                    <td>
-                        <a href="/add-user?id=2" class="btn-edit">Edit</a>
-                        <a href="#" class="btn-delete">Delete</a>
-                    </td>
-                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
 </main>
-<?php require "views/layouts/footer.php"; ?>
+
+<?php require BASE_PATH . "/views/layouts/footer.php"; ?>

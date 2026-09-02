@@ -41,6 +41,19 @@
                             </div>
                         </div>
                     </div>
+                       <div class="product-card" data-id="1" data-price="3.50" data-name="Espresso">
+                        <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300" alt="Espresso" class="product-img">
+                        <div class="product-details">
+                            <h4 class="product-title">Espresso</h4>
+                            <div class="product-price">$3.50</div>
+                            <div class="qty-control">
+                                <button type="button" class="qty-btn">-</button>
+                                <span class="qty-val">0</span>
+                                <button type="button" class="qty-btn">+</button>
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
             </div>
