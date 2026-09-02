@@ -2,50 +2,6 @@
 // controllers/OrderController.php
 
 require_once 'models/Order.php';
-require_once 'config/database.php';
-
-// اتصال قاعدة البيانات
-$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-if ($db->connect_error) {
-    die("Connection failed: " . $db->connect_error);
-}
-
-$orderController = new OrderController($db);
-
-// تحديد الـ Action حسب الـ URL
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-switch ($path) {
-    case '/admin/checks':
-        $orderController->checks();
-        break;
-        
-    case '/admin/current-orders':
-        $orderController->currentOrders();
-        break;
-        
-    case '/admin/update-status':
-        $orderController->updateStatus();
-        break;
-        
-    default:
-        // Route ديناميكي لتفاصيل الطلب
-        if (preg_match('#^/admin/order-details/(\d+)$#', $path, $matches)) {
-            $orderController->orderDetails($matches[1]);
-        } 
-        // Route ديناميكي لطلبات مستخدم معين
-        elseif (preg_match('#^/admin/order-details/user/(\d+)$#', $path, $matches)) {
-            $userId = $matches[1];
-            $fromDate = $_GET['from'] ?? date('Y-m-d', strtotime('-7 days'));
-            $toDate = $_GET['to'] ?? date('Y-m-d');
-            $orderController->userOrders($userId, $fromDate, $toDate);
-        }
-        else {
-            abort(404);
-        }
-        break;
-}
 
 class OrderController {
     private $orderModel;
