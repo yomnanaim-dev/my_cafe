@@ -1,30 +1,35 @@
 <?php
 
 <<<<<<< HEAD
-class Database {
-    private string $host    = 'localhost';
-    private string $db      = 'hotel_cafe';
-    private string $user    = 'root';
-    private string $pass    = '';
-    private string $charset = 'utf8mb4';
-    private ?PDO $pdo       = null;
+class DataBase
+{
+    public $connection;
 
-    public function connect(): PDO {
-        if ($this->pdo === null) {
-            $dsn = "mysql:host={$this->host};dbname={$this->db};charset={$this->charset}";
-            $options = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    public function __construct()
+    {
+        $dsn = "mysql:host=localhost;port=3306;dbname=hotel_cafe;charset=utf8mb4";
+
+        $this->connection = new PDO(
+            $dsn,
+            'root',
+            'root',
+            [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ];
-            try {
-                $this->pdo = new PDO($dsn, $this->user, $this->pass, $options);
-            } catch (PDOException $e) {
-                die("Database Connection Failed: " . $e->getMessage());
-            }
-        }
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]
+        );
+    }
 
-        return $this->pdo;
+    public function query($query, $params = [])
+    {
+        $statement = $this->connection->prepare($query);
+        $statement->execute($params);
+
+        return $statement;
+    }
+}
+
+$db = new DataBase();
 =======
 namespace Core;
 
@@ -75,6 +80,6 @@ class Database
         } else {
             return $result;
         }
->>>>>>> main
     }
 }
+>>>>>>> be44a5a1d630a79fee5595318208f9da8445b0c1
