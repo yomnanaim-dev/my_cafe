@@ -1,0 +1,158 @@
+* {
+    margin: 0;
+    padding: 0;
+   
+}
+
+body {
+    font-family: Arial, sans-serif;
+
+    background-color: #FFF8EC;
+    background-image: url('/my_cafe/public/images/login-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+}
+
+
+/* Login Container */
+.login-container {
+    width: 450px;
+    padding: 40px;
+
+    background: rgba(255, 248, 236, 0.55);
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+
+   
+}
+
+
+/* Title */
+h1 {
+    text-align: center;
+
+    color: #3F5632;
+
+    font-size: 42px;
+
+    margin-bottom: 35px;
+}
+
+
+/* Input Group */
+.input-group {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 20px;
+}
+
+
+/* Labels */
+.input-group label {
+    margin-bottom: 8px;
+
+    color: #3F5632;
+
+    font-weight: bold;
+}
+
+
+/* Inputs */
+.input-group input {
+    height: 45px;
+
+    padding: 0 12px;
+
+    border: 1.5px solid #B8C3A5;
+    border-radius: 10px;
+
+    background-color: rgba(255, 255, 255, 0.75);
+
+    color: #3F5632;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+}
+
+
+/* Placeholder */
+.input-group input::placeholder {
+    color: #8A967D;
+}
+
+
+/* Input Focus */
+.input-group input:focus {
+    outline: none;
+
+    border-color: #546B41;
+
+    background-color: rgba(255, 255, 255, 0.9);
+
+    
+}
+
+
+/* Remember Me */
+.remember-me {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 20px;
+
+    color: #3F5632;
+
+    font-weight: bold;
+}
+
+
+/* Checkbox */
+.remember-me input {
+    width: 16px;
+    height: 16px;
+
+    cursor: pointer;
+
+   
+}
+
+
+/* Button */
+button {
+    width: 100%;
+    height: 45px;
+
+    border: none;
+    border-radius: 10px;
+
+    background-color: #546B41;
+
+    color: #FFF8EC;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+/* Button Hover */
+button:hover {
+    background-color: #3F5632;
+
+}
