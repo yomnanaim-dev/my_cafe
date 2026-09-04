@@ -1,9 +1,13 @@
 <?php
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/Database.php'; // تأكد أن حرف D كبير مثل اسم الملف
 require_once __DIR__ . '/../../controllers/AuthController.php';
+
+// إنشاء اتصال باستخدام كلاس الليدر الجديد
+$database = new Config\Database();
+$db = $database->connect();
 
 $auth = new AuthController($db);
 $auth->checkRememberMe();
@@ -18,7 +22,7 @@ $errorMessage = $auth->login();
 <head>
 
     <title>Login</title>
-    <link rel="stylesheet" href="my_cafe/public/css/login.css">
+   <link rel="stylesheet" href="../../public/css/login.css">
 
 
 </head>
@@ -75,7 +79,7 @@ $errorMessage = $auth->login();
 
 
             <button type="submit">
-                Login
+                submit
             </button>
 
         </form>

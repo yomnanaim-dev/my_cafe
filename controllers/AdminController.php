@@ -11,13 +11,13 @@ class AdminController {
         
         // حماية أمان صارمة: التأكد إن اللي دخل الصفحة دي هو أدمن فقط
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            header("Location: /my_cafe/index.php");
+            header("Location: /views/auth/login.php");
             exit();
         }
     }
 
-    // دالة لجلب كل المستخدمين باستخدام دالة get() المتوافقة مع كلاس الـ Database
+    // دالة لجلب كل المستخدمين باستخدام دالة fetchAll() المتوافقة مع كلاس الـ Database الجديد لليدر
     public function getAllUsers() {
-        return $this->db->query("SELECT user_id, user_name, user_email, user_role FROM users")->get();
+        return $this->db->fetchAll("SELECT user_id, user_name, user_email, user_role FROM users");
     }
 }

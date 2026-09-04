@@ -1,4 +1,6 @@
 <?php
+
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -13,15 +15,21 @@ class AuthController {
     // دالة التحقق من الكوكي أو الـ Session وتسجيل الدخول التلقائي
     public function checkRememberMe() {
         if (!isset($_SESSION["user_id"]) && isset($_COOKIE["remember_user"])) {
-            $stmt = $this->db->query("SELECT * FROM users WHERE user_id = ?", [$_COOKIE["remember_user"]]);
-           $cookieUser = $this->db->query("SELECT * FROM users WHERE user_id = ?", [$_COOKIE["remember_user"]])->find();
+            $stmt = $this->db->prepare("SELECT * FROM users WHERE user_id = ?");
+            $stmt->execute([$_COOKIE["remember_user"]]);
+            $cookieUser = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($cookieUser) {
                 $_SESSION["user_id"] = $cookieUser['user_id'];
                 $_SESSION["user_name"] = $cookieUser['user_name'] ?? '';
                 $_SESSION["user_role"] = $cookieUser['user_role'] ?? 'user';
                 
-                header("Location: /my_cafe/index.php");
+                // التوجيه بناءً على الصلاحية عند تفعيل الـ Remember Me
+                if ($_SESSION["user_role"] === 'admin') {
+                    header("Location: /my_cafe/views/admin/dashboard.php");
+                } else {
+                    header("Location: /my_cafe/views/user/index.php");
+                }
                 exit();
             }
         }
@@ -36,19 +44,26 @@ class AuthController {
             $password = $_POST["password"] ?? '';
 
             if (!empty($email) && !empty($password)) {
-                $statement = $this->db->query("SELECT * FROM users WHERE user_email = ?", [$email]);
-             $user = $this->db->query("SELECT * FROM users WHERE user_email = ?", [$email])->find();
+                $stmt = $this->db->prepare("SELECT * FROM users WHERE user_email = ?");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if ($user && ($password === $user['user_password'] || password_verify($password, $user['user_password']))) {
+                // التحقق المباشر من الباسورد طالما متخزن نصياً في الداتا بيز (مثل 123456)
+                if ($user && $password == $user['user_password']) {
                     $_SESSION["user_id"] = $user['user_id'];
                     $_SESSION["user_name"] = $user['user_name'] ?? '';
                     $_SESSION["user_role"] = $user['user_role'] ?? 'user';
                     
                     if (isset($_POST["remember"])) {
-                        setcookie("remember_user", $user['user_id'], time() + (86400 * 30), "/");
+                        setcookie("remember_user", $user['user_id'], time() + (86400 * 30), "/", "", false, true);
                     }
                     
-                    header("Location: /my_cafe/index.php");
+                    // التوجيه الصحيح حسب نوع المستخدم (أدمن أو يوزر)
+                    if ($_SESSION["user_role"] === 'admin') {
+                        header("Location: /my_cafe/views/admin/dashboard.php");
+                    } else {
+                        header("Location: /my_cafe/views/user/index.php");
+                    }
                     exit();
                 } else {
                     $errorMessage = "Invalid email or password.";
