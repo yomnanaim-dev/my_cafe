@@ -1,0 +1,135 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #FBF8F1;
+    color: #3C4A3E;
+}
+
+.main-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 40px;
+}
+
+/* Header & Add Button */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header-actions h2 {
+    font-size: 28px;
+    color: #1E332A;
+    margin: 0;
+}
+
+.btn-add {
+    background-color: #2D4A3E;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add:hover {
+    background-color: #1e332a;
+}
+
+/* Users Table Card */
+.table-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid #E4DDD0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    color: #8C9A8E;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #F0F0F0;
+    letter-spacing: 0.8px;
+}
+
+td {
+    padding: 15px 0;
+    border-bottom: 1px solid #F8F8F8;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #E2E8DE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #2D4A3E;
+}
+
+/* Action Buttons (Edit & Delete) */
+.btn-edit {
+    background-color: #E2E8DE;
+    color: #2D4A3E;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 5px;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+    background-color: #2D4A3E;
+    color: #FFFFFF;
+}
+
+.btn-delete {
+    background-color: #FDF2F2;
+    color: #D9534F;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+    background-color: #D9534F;
+    color: #FFFFFF;
+}

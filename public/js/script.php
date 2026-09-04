@@ -14,123 +14,58 @@
         window.addEventListener("scroll", reveal);
         reveal(); // Trigger on load
 
+        // public/js/orders.js
+
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديث حالة الطلب
+    const updateButtons = document.querySelectorAll('.update-status-btn');
+    updateButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.dataset.orderId;
+            const select = document.querySelector(`.status-select[data-order-id="${orderId}"]`);
+            const status = select.value;
+            
+            if (!confirm(`Are you sure you want to change order #${orderId} status to "${status}"?`)) {
+                return;
+            }
+            
+            updateOrderStatus(orderId, status);
+        });
+    });
     
+    // دالة تحديث الحالة عبر AJAX
+    function updateOrderStatus(orderId, status) {
+        const formData = new FormData();
+        formData.append('order_id', orderId);
+        formData.append('status', status);
+        
+        fetch('/admin/update-status', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Status updated successfully!');
+                location.reload(); // إعادة تحميل الصفحة لتحديث الواجهة
+            } else {
+                alert('Error: ' + (data.message || 'Update failed'));
+            }
+        })
+        .catch(error => {
+            alert('Network error: ' + error.message);
+        });
+    }
+    
+    // دالة عرض طلبات المستخدم (لصفحة الـ Checks)
+    window.viewUserOrders = function(userId, fromDate, toDate) {
+        window.location.href = `/admin/order-details/user/${userId}?from=${fromDate}&to=${toDate}`;
+    };
+});
 
-
-const orders = <?= json_encode($orders) ?>;
-
-function showOrder(id){
-
-    let order = orders.find(o => o.id == id);
-    let box = document.getElementById("order-details");
-
-    box.innerHTML = `
-        <div class="details">
-
-            <h2>Order #${order.id}</h2>
-
-            <p><b>Status:</b> ${order.status}</p>
-            <p><b>Room:</b> ${order.room || "N/A"}</p>
-            <p><b>Notes:</b> ${order.notes || "No notes"}</p>
-
-            <h3>Products</h3>
-
-            ${order.items.map(item => `
-                <div class="detail-item">
-                    <span>${item.name} × ${item.qty}</span>
-                    <b>${item.price * item.qty} EGP</b>
-                </div>
-            `).join("")}
-
-            <div class="detail-total">
-                <b>Total</b>
-                <b>${order.total} EGP</b>
-            </div>
-
-        </div>
-    `;
+// دالة لتأكيد تغيير الحالة (استخدام اختياري)
+function confirmStatusChange(orderId, newStatus) {
+    return confirm(`Are you sure you want to change order #${orderId} to "${newStatus}"?`);
 }
-
-function changeQty(btn,change){
-
-    let item = btn.closest(".cart-item");
-    let qty = item.querySelector(".quantity span");
-
-    qty.textContent = Math.max(1,+qty.textContent + change);
-
-    item.querySelector(".item-total").textContent =
-        +item.dataset.price * +qty.textContent + " EGP";
-
-    updateCart();
-}
-
-function removeItem(btn){
-
-    btn.closest(".cart-item").remove();
-    updateCart();
-
-}
-function updateCart(){
-
-    let count=0;
-    let total=0;
-
-    document.querySelectorAll(".cart-item").forEach(item=>{
-
-        let qty=+item.querySelector(".quantity span").textContent;
-        let price=+item.dataset.price;
-
-        count+=qty;
-        total+=qty*price;
-
-    });
-
-    document.getElementById("count").textContent=count;
-    document.getElementById("total").textContent=total+" EGP";
-}
-
-function openCheckout(){
-
-    document.querySelector(".orders-page").style.display="none";
-    document.querySelector(".checkout-page").style.display="block";
-
-    let box=document.getElementById("checkout-items");
-    let total=0;
-
-    box.innerHTML="";
-
-    document.querySelectorAll(".cart-item").forEach(item=>{
-
-        let name=item.querySelector("strong").textContent;
-        let qty=+item.querySelector(".quantity span").textContent;
-        let price=+item.dataset.price;
-        let sum=qty*price;
-
-        total+=sum;
-
-        box.innerHTML+=`
-            <div class="checkout-item">
-                <span>${name} × ${qty}</span>
-                <strong>${sum} EGP</strong>
-            </div>
-        `;
-    });
-
-    document.getElementById("checkout-total").textContent=total+" EGP";
-}
-
-function backToCart(){
-
-    document.querySelector(".checkout-page").style.display="none";
-    document.querySelector(".orders-page").style.display="block";
-}
-
-
-
-
-function placeOrder(){
-    alert("Order placed successfully!");
-}
-
-</script>
-
+    </script>
+    

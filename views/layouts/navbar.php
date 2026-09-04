@@ -1,4 +1,4 @@
-<!-- TopNavBar -->
+TopNavBar
 <nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-lg border-b border-tertiary/20 dark:border-tertiary/10 shadow-sm shadow-primary/5">
 <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop flex justify-between items-center h-20">
 <a class="font-headline-md text-headline-md text-deep-forest dark:text-primary-fixed-dim tracking-tight" href="#">Verdant Café &amp; Lounge</a>
