@@ -1,58 +1,14 @@
 <?php
+
 require_once __DIR__ . "/../../models/Order.php";
 
-
-$orders = [
-    [
-        "id"=>101,
-        "date"=>"2026-08-20",
-        "total"=>250,
-        "status"=>"Processing",
-        "room"=>"204",
-        "notes"=>"Less sugar",
-        "items"=>[
-            ["name"=>"Cappuccino","qty"=>2,"price"=>80],
-            ["name"=>"Cake","qty"=>1,"price"=>90]
-        ]
-    ],
-    [
-        "id"=>102,
-        "date"=>"2026-08-25",
-        "total"=>340,
-        "status"=>"Out for Delivery",
-        "room"=>"310",
-        "notes"=>"",
-        "items"=>[
-            ["name"=>"Club Sandwich","qty"=>2,"price"=>170]
-        ]
-    ],
-    [
-        "id"=>103,
-        "date"=>"2026-08-27",
-        "total"=>180,
-        "status"=>"Done",
-        "room"=>"205",
-        "notes"=>"No sugar",
-        "items"=>[
-            ["name"=>"Coffee","qty"=>2,"price"=>50],
-            ["name"=>"Juice","qty"=>1,"price"=>80]
-        ]
-    ]
+$statusMap = [
+    'pending'   => 'Processing',
+    'confirmed' => 'Out for Delivery',
+    'completed' => 'Done',
+    'cancelled' => 'Cancelled'
 ];
 
-$cart = [
-    ["name"=>"Cappuccino","price"=>80,"qty"=>2],
-    ["name"=>"Club Sandwich","price"=>150,"qty"=>1],
-    ["name"=>"Fresh Juice","price"=>70,"qty"=>1]
-];
-
-$count = 0;
-$total = 0;
-
-foreach($cart as $item){
-    $count += $item["qty"];
-    $total += $item["price"] * $item["qty"];
-}
 ?>
 
 <div class="orders-page">
@@ -62,334 +18,459 @@ foreach($cart as $item){
         <p>View your orders and track their status</p>
     </div>
 
-    <form class="date-filter">
+
+    <!-- Date Filter -->
+
+    <form class="date-filter" method="GET">
+
         <div>
             <label>From</label>
-            <input type="date" name="from">
+
+            <input
+                type="date"
+                name="from"
+                value="<?= htmlspecialchars($_GET['from'] ?? '') ?>"
+            >
         </div>
 
         <div>
             <label>To</label>
-            <input type="date" name="to">
+
+            <input
+                type="date"
+                name="to"
+                value="<?= htmlspecialchars($_GET['to'] ?? '') ?>"
+            >
         </div>
 
-        <button>Filter</button>
+        <button type="submit">
+            Filter
+        </button>
+
     </form>
+
+
+    <!-- Orders -->
 
     <div class="orders-list">
 
-        <?php foreach($orders as $order): ?>
+        <?php if (empty($orders)): ?>
 
-            <div class="order"
-                 onclick="showOrder(<?= $order['id'] ?>)">
-
-                <div>
-                    <strong>Order #<?= $order["id"] ?></strong>
-                    <small><?= $order["date"] ?></small>
-                </div>
-
-                <strong><?= $order["total"] ?> EGP</strong>
-
-                <span><?= $order["status"] ?></span>
-
-                <?php if(Order::canCancel($order["status"])): ?>
-                    <button onclick="event.stopPropagation()">
-                        Cancel
-                    </button>
-                <?php endif; ?>
-
+            <div class="empty">
+                No orders found.
             </div>
 
-        <?php endforeach; ?>
+        <?php else: ?>
 
-    </div>
+            <?php foreach ($orders as $order): ?>
 
-    <div id="order-details"></div>
+                <?php
+                $status = $order['order_status'];
 
-    <div class="cart-section">
+                $statusText =
+                    $statusMap[$status] ?? $status;
 
-        <div class="section-title">
-            <h2>Your Cart</h2>
-            <span><?= $count ?> items</span>
-        </div>
+                $orderId = (int)$order['order_id'];
+                ?>
 
-        <div class="cart-list">
+                <div class="order-card">
 
-            <?php foreach($cart as $item): ?>
+                    <!-- Order Header -->
 
-                <div class="cart-item"
-                     data-price="<?= $item["price"] ?>">
+                    <div class="order-info">
 
-                    <div>
-                        <strong><?= $item["name"] ?></strong>
-                        <small><?= $item["price"] ?> EGP each</small>
+                        <div>
+                            <strong>
+                                Order #<?= $orderId ?>
+                            </strong>
+
+                            <small>
+                                <?= date(
+                                    'Y-m-d H:i',
+                                    strtotime($order['order_created_at'])
+                                ) ?>
+                            </small>
+                        </div>
+
+                        <strong class="total">
+                            <?= htmlspecialchars($order['order_total']) ?>
+                            EGP
+                        </strong>
+
                     </div>
 
-                    <div class="quantity">
-                        <button onclick="changeQty(this,-1)">−</button>
-                        <span><?= $item["qty"] ?></span>
-                        <button onclick="changeQty(this,1)">+</button>
+
+                    <!-- Status -->
+
+                    <div class="order-status">
+
+                        <span class="status <?= htmlspecialchars($status) ?>">
+                            <?= htmlspecialchars($statusText) ?>
+                        </span>
+
                     </div>
 
-                    <strong class="item-total">
-                        <?= $item["price"]*$item["qty"] ?> EGP
-                    </strong>
 
-                    <button class="remove"
-                            onclick="removeItem(this)">
-                        ×
+                    <!-- Expand Button -->
+
+                    <button
+                        type="button"
+                        class="details-btn"
+                        onclick="toggleOrder(<?= $orderId ?>)"
+                    >
+                        <span id="btn-text-<?= $orderId ?>">
+                            View Details
+                        </span>
+
+                        <span id="arrow-<?= $orderId ?>">
+                            ▼
+                        </span>
                     </button>
+
+
+                    <!-- Order Details -->
+
+                    <div
+                        class="order-details"
+                        id="details-<?= $orderId ?>"
+                    >
+
+                        <?php if (!empty($order['items'])): ?>
+
+                            <?php foreach ($order['items'] as $item): ?>
+
+                                <div class="item">
+
+                                    <span>
+                                        <?= htmlspecialchars(
+                                            $item['product_name']
+                                        ) ?>
+                                    </span>
+
+                                    <span>
+                                        × <?= (int)$item['item_QTY'] ?>
+                                    </span>
+
+                                    <strong>
+                                        <?= htmlspecialchars(
+                                            $item['price_at_order']
+                                        ) ?>
+                                        EGP
+                                    </strong>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+
+                            <div class="item">
+                                No items found.
+                            </div>
+
+                        <?php endif; ?>
+
+
+                        <!-- Room + Note -->
+
+                        <div class="extra-info">
+
+                            <span>
+                                Room:
+                                <?= htmlspecialchars(
+                                    $order['room_number'] ?? 'N/A'
+                                ) ?>
+                            </span>
+
+                            <span>
+                                Note:
+                                <?= htmlspecialchars(
+                                    $order['order_note'] ?? 'None'
+                                ) ?>
+                            </span>
+
+                        </div>
+
+
+                        <!-- Cancel -->
+
+                        <?php if (Order::canCancel($status)): ?>
+
+                            <form
+                                method="POST"
+                                action="/my_cafe/cancel-my-order"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="order_id"
+                                    value="<?= $orderId ?>"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="cancel-btn"
+                                >
+                                    Cancel Order
+                                </button>
+
+                            </form>
+
+                        <?php endif; ?>
+
+                    </div>
 
                 </div>
 
             <?php endforeach; ?>
 
-        </div>
-
-        <div class="cart-bottom">
-
-            <div>
-                <small>Items</small>
-                <strong id="count"><?= $count ?></strong>
-            </div>
-
-            <div>
-                <small>Total</small>
-                <strong id="total"><?= $total ?> EGP</strong>
-            </div>
-
-            <button class="checkout-btn"
-                    onclick="openCheckout()">
-                Checkout
-            </button>
-
-        </div>
+        <?php endif; ?>
 
     </div>
 
 </div>
-
-<?php require "checkout.php"; ?>
-
-
 <style>
 
-.orders-page{
-    max-width:1000px;
-    margin:auto;
-    padding:110px 25px 70px;
-    color:#546B41;
+.orders-page {
+    width: min(1000px, 92%);
+    margin: auto;
+    padding: 50px 0;
 }
 
-.page-title{
-    text-align:center;
-    margin-bottom:35px;
+.page-title {
+    margin-bottom: 25px;
 }
 
-.page-title h1{
-    font-size:36px;
-    margin-bottom:8px;
+.page-title h1 {
+    margin: 0;
+    color: #546B41;
 }
 
-.page-title p{
-    color:#777;
+.page-title p {
+    color: #777;
 }
 
-.date-filter{
-    display:flex;
-    justify-content:center;
-    align-items:end;
-    gap:12px;
-    margin-bottom:25px;
+
+/* Date Filter */
+
+.date-filter {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #DCCCAC;
+    border-radius: 12px;
 }
 
-.date-filter label{
-    display:block;
-    font-size:13px;
-    margin-bottom:5px;
+.date-filter div {
+    flex: 1;
 }
 
-.date-filter input{
-    padding:10px;
-    border:1px solid #DCCCAC;
-    border-radius:7px;
+.date-filter label {
+    display: block;
+    margin-bottom: 7px;
+    color: #555;
 }
 
-.date-filter button,
-.checkout-btn{
-    padding:11px 22px;
-    border:0;
-    border-radius:7px;
-    background:#546B41;
-    color:white;
-    cursor:pointer;
+.date-filter input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #DCCCAC;
+    border-radius: 7px;
 }
 
-.orders-list,
-.cart-list{
-    background:white;
-    border:1px solid #DCCCAC;
-    border-radius:12px;
-    overflow:hidden;
+.date-filter button {
+    padding: 11px 25px;
+    border: 0;
+    border-radius: 7px;
+    background: #546B41;
+    color: white;
+    cursor: pointer;
 }
 
-.order{
-    display:grid;
-    grid-template-columns:1.5fr 1fr 1.2fr auto;
-    align-items:center;
-    gap:15px;
-    padding:18px 22px;
-    border-bottom:1px solid #eee;
-    cursor:pointer;
+
+/* Orders */
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.order:last-child{
-    border-bottom:0;
+.order-card {
+    background: white;
+    border: 1px solid #DCCCAC;
+    border-radius: 12px;
+    padding: 22px;
 }
 
-.order small,
-.cart-item small{
-    display:block;
-    color:#999;
-    margin-top:4px;
+
+/* Order Info */
+
+.order-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.status{
-    background:#DCCCAC;
-    color:#546B41;
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:13px;
-    width:max-content;
+.order-info strong {
+    color: #333;
 }
 
-.order button{
-    border:0;
-    background:#FFF8EC;
-    color:#546B41;
-    padding:7px 12px;
-    border-radius:6px;
-    cursor:pointer;
+.order-info small {
+    display: block;
+    margin-top: 5px;
+    color: #888;
 }
 
-.cart-section{
-    margin-top:45px;
+.order-info .total {
+    color: #546B41;
 }
 
-.section-title{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
+
+/* Status */
+
+.order-status {
+    margin-top: 15px;
 }
 
-.section-title h2{
-    margin:0;
+.status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
 }
 
-.section-title span{
-    color:#888;
-    font-size:14px;
+.status.pending {
+    background: #fff3cd;
+    color: #856404;
 }
 
-.cart-item{
-    display:grid;
-    grid-template-columns:1fr auto auto auto;
-    align-items:center;
-    gap:25px;
-    padding:18px 22px;
-    border-bottom:1px solid #eee;
+.status.confirmed {
+    background: #dbeafe;
+    color: #1e40af;
 }
 
-.quantity{
-    display:flex;
-    align-items:center;
-    gap:10px;
+.status.completed {
+    background: #d1fae5;
+    color: #065f46;
 }
 
-.quantity button{
-    width:28px;
-    height:28px;
-    border:1px solid #DCCCAC;
-    background:#FFF8EC;
-    color:#546B41;
-    border-radius:6px;
-    cursor:pointer;
+.status.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
-.remove{
-    border:0;
-    background:none;
-    color:#999;
-    font-size:20px;
-    cursor:pointer;
+
+/* Details Button */
+
+.details-btn {
+    margin-top: 18px;
+    padding: 9px 15px;
+    border: 1px solid #DCCCAC;
+    border-radius: 7px;
+    background: white;
+    color: #546B41;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-.cart-bottom{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:35px;
-    margin-top:18px;
-    padding:20px;
-    background:#FFF8EC;
-    border-radius:10px;
+.details-btn:hover {
+    background: #f7f5ef;
 }
 
-.cart-bottom small{
-    display:block;
-    color:#888;
+
+/* Order Details */
+
+.order-details {
+    display: none;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
 
-#order-details{
-    margin-top:25px;
+.order-details.show {
+    display: block;
 }
 
-.details{
-    background:white;
-    border:1px solid #DCCCAC;
-    border-radius:12px;
-    padding:25px;
+
+/* Items */
+
+.item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
 }
 
-.details h2{
-    margin-top:0;
+
+/* Room + Note */
+
+.extra-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 15px;
+    color: #666;
 }
 
-.detail-item,
-.detail-total{
-    display:flex;
-    justify-content:space-between;
-    padding:12px 0;
-    border-bottom:1px solid #eee;
+
+/* Cancel */
+
+.cancel-btn {
+    margin-top: 18px;
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 7px;
+    background: #b84a4a;
+    color: white;
+    cursor: pointer;
 }
 
-.detail-total{
-    border-top:2px solid #DCCCAC;
-    border-bottom:0;
-    margin-top:10px;
-    padding-top:18px;
+.cancel-btn:hover {
+    opacity: 0.9;
 }
 
-@media(max-width:700px){
 
-    .date-filter{
-        flex-wrap:wrap;
+/* Empty */
+
+.empty {
+    padding: 40px;
+    text-align: center;
+    background: white;
+    border: 1px solid #DCCCAC;
+    border-radius: 12px;
+    color: #777;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .date-filter {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .order{
-        grid-template-columns:1fr 1fr;
+    .item {
+        grid-template-columns: 1fr;
+        gap: 5px;
     }
 
-    .cart-item{
-        grid-template-columns:1fr auto;
+    .extra-info {
+        flex-direction: column;
     }
 
-    .cart-bottom{
-        flex-wrap:wrap;
-        justify-content:center;
+    .order-info {
+        gap: 15px;
     }
+
 }
 
 </style>
-<script src="/cafeteria/public/js/script.js"></script>
+<script src="/my_cafe/public/js/script.js"></script>
