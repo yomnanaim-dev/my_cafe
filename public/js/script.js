@@ -466,3 +466,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
   renderProducts();
 });
+function toggleOrder(orderId) {
+    const details = document.getElementById("details-" + orderId);
+    const buttonText = document.getElementById("btn-text-" + orderId);
+    const arrow = document.getElementById("arrow-" + orderId);
+
+    if (!details) {
+        return;
+    }
+
+    if (details.classList.contains("show")) {
+        details.classList.remove("show");
+
+        if (buttonText) {
+            buttonText.textContent = "View Details";
+        }
+
+        if (arrow) {
+            arrow.textContent = "▼";
+        }
+    } else {
+        details.classList.add("show");
+
+        if (buttonText) {
+            buttonText.textContent = "Hide Details";
+        }
+
+        if (arrow) {
+            arrow.textContent = "▲";
+        }
+    }
+}
+

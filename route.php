@@ -5,7 +5,7 @@ require_once 'config/database.php';
 require_once 'controllers/OrderController.php';
 
 // اتصال قاعدة البيانات
-$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$db = new PDO(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 if ($db->connect_error) {
     die("Connection failed: " . $db->connect_error);
